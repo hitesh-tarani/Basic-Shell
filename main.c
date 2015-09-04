@@ -9,6 +9,10 @@
 
 FILE* source;
 char pwd[MAXTOKLEN+1];
+char PATH[MAXTOKLEN+1];
+char HOME[MAXTOKLEN+1];
+
+char temp[MAXTOKLEN+1];
 
 typedef enum{
 
@@ -21,11 +25,24 @@ char** args;
 int status;
 
 void do_cd()
-{    
+{
+    int i;
     //fprintf(stdout, "%d\n", args[1][0]);
     if(args[1]!=NULL)
     {
-        if(!chdir(args[1]))
+        if(args[1][0]=='~' && args[1][1]=='/')
+        {
+            chdir(HOME);
+            for(i=2;i<strlen(args[1]);i++)
+            {
+                temp[i-2]=args[1][i];
+            }
+            temp[i-2]='\0';
+            //fprintf(stdout, "%s\n", temp);
+            chdir(temp);
+            getcwd(pwd,MAXTOKLEN+1);
+        }
+        else if(!chdir(args[1]))
         {
             //fprintf(stdout, "%s\n", pwd);
             getcwd(pwd,MAXTOKLEN+1);          //update pwd
@@ -34,13 +51,14 @@ void do_cd()
         {
             // errors in chdir
             if(errno==ENOENT)
-                fprintf(stdout,"cd:%s:No such file exists\n",args[1]);
+                fprintf(stdout,"cd:%s:No such directory exists\n",args[1]);
             else if(errno==ENOTDIR)
                 fprintf(stdout,"cd:%s:Specified path not a directory\n",args[1]);
         }
     }
     else
-    fprintf(stdout, "No file argument provided\n");
+        fprintf(stdout, "No directory argument provided\n");
+    fprintf(stdout, "Current Directory: %s\n", pwd);
 }
 
 void do_clr()
@@ -54,24 +72,40 @@ void do_clr()
 void do_dir()
 {
     DIR* dir=NULL;
-    dir=opendir(pwd);
+    if(args[1]!=NULL)
+    {
+    dir=opendir(args[1]);
     int count;
     struct dirent *dptr = NULL;
-    if(NULL == dir) 
+    if(NULL == dir)
     { 
-        printf("\n ERROR : Could not open the working directory\n"); 
-    }                         
-    //printf("\n"); 
-    // Go through and display all the names (files or folders) contained in the directory. 
-    for(count = 0; NULL != (dptr = readdir(dir)); count++) 
-    { 
-        printf("%s  ",dptr->d_name); 
-    } 
-    printf("\nTotal %u\n", count);
+        fprintf(stdout,"Could not open the working directory\n"); 
+    }
+    else
+    {
+        //printf("\n"); 
+        // Go through and display all the names (files or folders) contained in the directory. 
+        for(count = 0; NULL != (dptr = readdir(dir)); count++) 
+        { 
+            printf("%s  ",dptr->d_name); 
+        }
+        printf("\nTotal %u\n", count);
+    }
+    }
+    else
+        fprintf(stdout,"Directory not found\n");
+        
 }
+
 void do_echo()
 {
-    fprintf(stdout,"%s\n",args[1]);
+    int i=1;
+    while(args[i]!=NULL)
+    {
+        fprintf(stdout,"%s ",args[i]);
+        i++;
+    }
+    fprintf(stdout,"\n");
 }
 
 void do_pause()
@@ -86,7 +120,9 @@ void do_help()
 
 void do_environ()
 {
-    ;
+    fprintf(stdout,"PWD=%s\n",pwd);
+    fprintf(stdout,"HOME=%s\n",HOME);
+    fprintf(stdout,"PATH=%s\n",PATH);
 }
 
 void do_quit()
@@ -153,7 +189,7 @@ char *read_line()
 {
   char *line1 = NULL;
   size_t buffersize = 0; 
-  getline(&line1, &buffersize, stdin);
+  getline(&line1, &buffersize, source);
   return line1;
 }
 
@@ -194,9 +230,10 @@ char** parse(char* line1)
     
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[], char *evnp[])
 {
-    /*if(argc==1)
+    strcpy(HOME,getenv("HOME"));
+    if(argc==1)
     {
         source=stdin;
     }
@@ -208,16 +245,26 @@ int main(int argc, char *argv[])
             fprintf(stderr, "File %s not found\n",argv[1]);
             return 0;
         }
-    }*/
+    }
     //char prompt[60];
+    int i;
     getcwd(pwd,MAXTOKLEN+1);
+    strcpy(PATH,pwd);
+    for(i=1;i<strlen(argv[0]);i++)
+    {
+        temp[i-1]=argv[0][i];
+    }
+    temp[i-1]='\0';
+    //fprintf(stdout, "%s\n", temp);
+    strcat(PATH,temp);
     //printf("%s\n",pwd);
     do{
     fprintf(stdout, "shell:%s$ ", strrchr(pwd,'/')+1);
     line=read_line();
     args=parse(line);
     //fprintf(stdout, "%s\n", args[0]);
-    execute(args[0]);
+    if(args[0]!=NULL)
+        execute(args[0]);
     }while(1);
     return 0;
 }
