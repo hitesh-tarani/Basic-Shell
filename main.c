@@ -168,8 +168,6 @@ void execute(char* token)
         command=help;
     if(!(strcmp(token,"quit")))
         command=quit;
-    if(command)
-    {
     switch(command)
     {
         case cd:
@@ -197,11 +195,11 @@ void execute(char* token)
             do_clr();
             break;
         case nothing:
+            fprintf(stdout,"%s: Command not found\n",args[0]);
             break;
         default:
             break;
     } 
-    }
 }
 
 char *read_line()
