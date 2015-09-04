@@ -134,48 +134,7 @@ void do_pause()
 
 void do_help()
 {
-      if(args[1]==NULL)
-    {
-      printf("Please enter the arguement.\nFollowing are the allowed arguements\n");
-      printf("  cd\n  clr\n  pause\n  dir\n  environ\n  echo\n  quit\n");
-      printf("Sample input\nhelp <arguement>\n"); 
-    }
-  else if(!strcmp(args[1],"cd"))
-    {
-      printf("NAME\n\tcd - change directory\n\nSYNOPSIS\n\tcd [directory]\n\nDESCRIPTION\n\t​Changes the current default directory to [directory] \n​If the [directory] argument is not present, the current directory is reported.\n");
-    } 
-  else if(!strcmp(args[1],"clr"))
-    {
-      printf("NAME\n\tclr - clear screen\n\nSYNOPSIS\n\tclr\n\nDESCRIPTION\n\tClears the terminal.\n");
-    }
-  else if(!strcmp(args[1],"pause"))
-    {
-      printf("NAME\n\tpause - pause the shell\n\nSYNOPSIS\n\tpause\n\nDESCRIPTION\n\tPauses the shell until enter is pressed.\n");
-    }
-  else if(!strcmp(args[1],"dir"))
-    {
-      printf("NAME\n\tdir - list directory files\n\nSYNOPSIS\n\tdir [directory]\n\nDESCRIPTION\n\t­Lists the contents of directory.\n");
-    }
-  else if(!strcmp(args[1],"echo"))
-    {
-      printf("NAME\n\techo - display line of text\n\nSYNOPSIS\n\techo [string]\n\nDESCRIPTION\n\tEcho the string to the standard output.\n");
-    }
-  else if(!strcmp(args[1],"environ"))
-    {
-      printf("NAME\n\tenviron - displays the environment variable bindings\n\nSYNOPSIS\n\tenviron\n\nDESCRIPTION\n\tLists all the environment strings.\n");
-    }
-  else if(!strcmp(args[1],"quit"))
-    {
-      printf("NAME\n\tquit - exit shell\n\nSYNOPSIS\n\tquit\n\nDESCRIPTION\n\tQuits the shell.");
-    }
-  else
-    {
-      printf("Wrong argument\n");
-      printf("Please enter the correct arguement.\nFollowing are the allowed arguements\n");
-      printf("  cd\n  clr\n  pause\n  dir\n  environ\n  echo\n  quit\n");
-      printf("Sample input\nhelp <arguement>\n");
-    }
-
+    ;
 }
 
 void do_environ()
