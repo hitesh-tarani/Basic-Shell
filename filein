@@ -1,9 +1,8 @@
 dir
 dir ..
+cd ..
 cd Assignment2
 environ
-pause
-clr
 echo my name
 help
 quit

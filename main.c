@@ -88,7 +88,7 @@ void do_dir()
         // Go through and display all the names (files or folders) contained in the directory. 
         for(count = 0; NULL != (dptr = readdir(dir)); count++) 
         { 
-            printf("%s  ",dptr->d_name); 
+            printf("%s \n",dptr->d_name); 
         }
         printf("\nTotal %u\n", count);
     }
@@ -102,7 +102,7 @@ void do_dir()
     // Go through and display all the names (files or folders) contained in the directory. 
     for(count = 0; NULL != (dptr = readdir(dir)); count++) 
     { 
-        printf("%s  ",dptr->d_name); 
+        printf("%s \n",dptr->d_name); 
     }
     printf("\nTotal %u\n", count);
     }   
@@ -121,6 +121,11 @@ void do_echo()
 
 void do_pause()
 {
+    if(args[1]!=NULL)
+    {
+        fprintf(stderr,"pause: Too many arguments\n");
+        return ;
+    }
     fprintf(stdout,"Press Enter to resume\n");
     tcflow(STDOUT_FILENO, TCOOFF);
     char temp_char='\0';
@@ -180,6 +185,11 @@ void do_help()
 
 void do_environ()
 {
+    if(args[1]!=NULL)
+    {
+        fprintf(stderr,"env: Too many arguments\n");
+        return ;
+    }
     fprintf(stdout,"PWD=%s\n",pwd);
     fprintf(stdout,"HOME=%s\n",HOME);
     fprintf(stdout,"PATH=%s\n",PATH);
