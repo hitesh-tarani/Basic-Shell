@@ -4,6 +4,7 @@
 #include<errno.h>
 #include<stdlib.h>
 #include<dirent.h>
+#include<termios.h>
 
 #define MAXTOKLEN 1024
 
@@ -93,8 +94,18 @@ void do_dir()
     }
     }
     else
-        fprintf(stdout,"Directory not found\n");
-        
+    {
+    dir=opendir(pwd);
+    int count;
+    struct dirent *dptr = NULL;
+    //printf("\n"); 
+    // Go through and display all the names (files or folders) contained in the directory. 
+    for(count = 0; NULL != (dptr = readdir(dir)); count++) 
+    { 
+        printf("%s  ",dptr->d_name); 
+    }
+    printf("\nTotal %u\n", count);
+    }   
 }
 
 void do_echo()
@@ -110,7 +121,15 @@ void do_echo()
 
 void do_pause()
 {
-    ;
+    fprintf(stdout,"Press Enter to resume\n");
+    tcflow(STDOUT_FILENO, TCOOFF);
+    char temp_char='\0';
+    while(temp_char!='\n')
+    {
+        fscanf(source,"%c",&temp_char);
+    }
+    tcflush(STDOUT_FILENO, TCIOFLUSH);
+    tcflow(STDOUT_FILENO, TCOON);
 }
 
 void do_help()
@@ -187,10 +206,13 @@ void execute(char* token)
 
 char *read_line()
 {
-  char *line1 = NULL;
-  size_t buffersize = 0; 
-  getline(&line1, &buffersize, source);
-  return line1;
+    char *line1 = NULL;
+    size_t buffersize = 0; 
+    if((getline(&line1, &buffersize, source))!=-1)
+        return line1;
+    else
+        exit(0);
+    
 }
 
 #define TOKEN_DELIM " \t\r\n\a"
@@ -246,7 +268,6 @@ int main(int argc, char *argv[], char *evnp[])
             return 0;
         }
     }
-    //char prompt[60];
     int i;
     getcwd(pwd,MAXTOKLEN+1);
     strcpy(PATH,pwd);
@@ -259,7 +280,10 @@ int main(int argc, char *argv[], char *evnp[])
     strcat(PATH,temp);
     //printf("%s\n",pwd);
     do{
-    fprintf(stdout, "shell:%s$ ", strrchr(pwd,'/')+1);
+    if(source==stdin)
+        fprintf(stdout, "shell:%s$ ", strrchr(pwd,'/')+1);
+    else
+        fprintf(stdout,"\n");
     line=read_line();
     args=parse(line);
     //fprintf(stdout, "%s\n", args[0]);
